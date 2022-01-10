@@ -1,7 +1,6 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import styled from "styled-components";
 import { useRouter } from "next/router";
-import { Avatar } from "@mui/material";
 import TopBar from "src/components/topBar";
 import { UserType } from "src/types";
 import Feed from "src/components/feed";
@@ -16,7 +15,7 @@ import { followUser, unfollowUser } from "src/store/slices/userSlice";
 
 interface Props {}
 
-interface userData extends UserType {
+interface UserData extends UserType {
 	loading: boolean;
 	myProfile: boolean;
 }
@@ -29,12 +28,10 @@ const ProfileFollowsTemplate: React.FC<Props> = ({ children }) => {
 			`/api/user/userByTagName?tag_name=${query.tagName}&profile_id=${user._id}`,
 		fetcher
 	);
-	const [followUserLoading, setFollowUserLoading] = useState<boolean>(false);
-	const [unfollowUserLoading, setUnfollowUserLoading] =
-		useState<boolean>(false);
+
 	const dispatch = useDispatch();
 
-	const userData: userData = useMemo(() => {
+	const userData: UserData = useMemo(() => {
 		switch (query.tagName) {
 			case user?.tag_name: {
 				return { ...user, loading, myProfile: true };
@@ -69,26 +66,6 @@ const ProfileFollowsTemplate: React.FC<Props> = ({ children }) => {
 		}
 		return child;
 	});
-
-	const handleFollowUser = useCallback(async () => {
-		if (!userData.myProfile) {
-			setFollowUserLoading(true);
-			await dispatch(
-				followUser({ tag_name: userData.tag_name, profile_id: user._id })
-			);
-			setFollowUserLoading(false);
-		}
-	}, [dispatch, userData, user]);
-
-	const handleUnfollowUser = useCallback(async () => {
-		if (!userData.myProfile) {
-			setUnfollowUserLoading(true);
-			await dispatch(
-				unfollowUser({ tag_name: userData.tag_name, profile_id: user._id })
-			);
-			setUnfollowUserLoading(false);
-		}
-	}, [dispatch, userData, user]);
 
 	return (
 		<>

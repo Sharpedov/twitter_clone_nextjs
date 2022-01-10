@@ -25,7 +25,7 @@ import Link from "next/link";
 
 interface Props {}
 
-interface userData extends UserType {
+interface UserData extends UserType {
 	loading: boolean;
 	myProfile: boolean;
 }
@@ -44,7 +44,7 @@ const ProfileTemplate: React.FC<Props> = ({ children }) => {
 	const [editProfileModal, setEditProfileModal] = useState(false);
 	const dispatch = useDispatch();
 
-	const userData: userData = useMemo(() => {
+	const userData: UserData = useMemo(() => {
 		switch (query.tagName) {
 			case user?.tag_name: {
 				return { ...user, loading, myProfile: true };

@@ -23,8 +23,8 @@ const AvatarProfile: React.FC<Props> = ({
 	return loading ? (
 		<SkeletonLoader height={size ?? 40} width={size ?? 40} variant="circular" />
 	) : link ? (
-		<Link href={`${userTagName}`} passHref>
-			<StyledLink href={`${userTagName}`}>
+		<Link href={`/${userTagName}`} passHref>
+			<StyledLink>
 				<StyledAvatar
 					src={src}
 					alt={userTagName}
