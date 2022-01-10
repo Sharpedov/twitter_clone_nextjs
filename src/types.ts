@@ -11,6 +11,8 @@ export type UserType = {
 	tweet_count: number;
 	_id: string;
 	isFollowed: boolean;
+	isFollowsYou: boolean;
+	myProfile: boolean;
 	createdAt: number;
 	updatedAt: number;
 };

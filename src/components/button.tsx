@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import styled from "styled-components";
 
 interface Props {
+	children: React.ReactNode;
 	onClick?: () => void;
 	variant?: "contained" | "outlined" | "unfollow";
 	disabled?: boolean;
@@ -12,92 +13,102 @@ interface Props {
 	color?: "primary" | "secondary";
 	className?: string;
 }
+type RefType = HTMLDivElement;
 
-const CustomButton: React.FC<Props> = ({
-	children,
-	disabled,
-	onClick,
-	size,
-	fullWidth,
-	type,
-	color = "primary",
-	variant,
-	className,
-}) => {
-	const [unfollowButtonHover, setUnfollowButtonHover] =
-		useState<boolean>(false);
+const CustomButton = React.forwardRef(
+	(
+		{
+			children,
+			disabled,
+			onClick,
+			size,
+			fullWidth,
+			type,
+			color = "primary",
+			variant,
+			className,
+		}: Props,
+		ref: React.ForwardedRef<RefType>
+	) => {
+		const [unfollowButtonHover, setUnfollowButtonHover] =
+			useState<boolean>(false);
 
-	console.log("unfollowButtonHover", unfollowButtonHover);
-
-	const ButtonElement = useMemo(() => {
-		switch (variant) {
-			case "outlined": {
-				return (
-					<StyledOutlinedButton
-						className={className}
-						type={type}
-						variant="outlined"
-						disabled={disabled}
-						onClick={onClick}
-						size={size ?? "medium"}
-						fullWidth={fullWidth}
-						color={color ?? "primary"}
-					>
-						{children}
-					</StyledOutlinedButton>
-				);
+		const ButtonElement = useMemo(() => {
+			switch (variant) {
+				case "outlined": {
+					return (
+						<StyledOutlinedButton
+							ref={ref}
+							className={className}
+							type={type}
+							variant="outlined"
+							disabled={disabled}
+							onClick={onClick}
+							size={size ?? "medium"}
+							fullWidth={fullWidth}
+							color={color ?? "primary"}
+						>
+							{children}
+						</StyledOutlinedButton>
+					);
+				}
+				case "unfollow": {
+					return (
+						<StyledUnfollowButton
+							ref={ref}
+							className={className}
+							type={type}
+							variant="outlined"
+							disabled={disabled}
+							onClick={onClick}
+							size={size ?? "medium"}
+							fullWidth={fullWidth}
+							color={color ?? "primary"}
+							onMouseEnter={() => setUnfollowButtonHover(true)}
+							onMouseLeave={() => setUnfollowButtonHover(false)}
+						>
+							{unfollowButtonHover ? "Unfollow" : children}
+						</StyledUnfollowButton>
+					);
+				}
+				default:
+					return (
+						<StyledContainedButton
+							ref={ref}
+							className={className}
+							type={type}
+							variant={variant ?? "contained"}
+							disabled={disabled}
+							onClick={onClick}
+							size={size ?? "medium"}
+							fullWidth={fullWidth}
+							color={color ?? "primary"}
+						>
+							{children}
+						</StyledContainedButton>
+					);
 			}
-			case "unfollow": {
-				return (
-					<StyledUnfollowButton
-						className={className}
-						type={type}
-						variant="outlined"
-						disabled={disabled}
-						onClick={onClick}
-						size={size ?? "medium"}
-						fullWidth={fullWidth}
-						color={color ?? "primary"}
-						onMouseEnter={() => setUnfollowButtonHover(true)}
-						onMouseLeave={() => setUnfollowButtonHover(false)}
-					>
-						{unfollowButtonHover ? "Unfollow" : children}
-					</StyledUnfollowButton>
-				);
-			}
-			default:
-				return (
-					<StyledContainedButton
-						className={className}
-						type={type}
-						variant={variant ?? "contained"}
-						disabled={disabled}
-						onClick={onClick}
-						size={size ?? "medium"}
-						fullWidth={fullWidth}
-						color={color ?? "primary"}
-					>
-						{children}
-					</StyledContainedButton>
-				);
-		}
-	}, [
-		type,
-		variant,
-		disabled,
-		onClick,
-		size,
-		fullWidth,
-		color,
-		children,
-		className,
-		unfollowButtonHover,
-	]);
+		}, [
+			type,
+			variant,
+			disabled,
+			onClick,
+			size,
+			fullWidth,
+			color,
+			children,
+			className,
+			unfollowButtonHover,
+			ref,
+		]);
 
-	return ButtonElement;
-};
+		return ButtonElement;
+	}
+);
 
 export default CustomButton;
+
+CustomButton.displayName = "CustomButton";
 
 const StyledButton = styled(Button)`
 	background-color: ${({ theme, color }) =>
