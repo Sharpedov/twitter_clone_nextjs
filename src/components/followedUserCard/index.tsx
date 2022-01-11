@@ -12,117 +12,124 @@ interface Props {
 	userId: string;
 	mutate: any;
 }
+type RefType = HTMLDivElement;
 
-const FollowedUserCard: React.FC<Props> = ({
-	followUserData,
-	userId,
-	mutate,
-}) => {
-	const {
-		tag_name,
-		name,
-		description,
-		profile_image_url,
-		isFollowed,
-		isFollowsYou,
-	} = followUserData;
-	const { push } = useRouter();
-	const [followUserLoading, setFollowUserLoading] = useState<boolean>(false);
-	const [unfollowUserLoading, setUnfollowUserLoading] =
-		useState<boolean>(false);
-	const dispatch = useDispatch();
-	const myProfile = userId === followUserData._id;
-	const followButtonRef = useRef(null!);
+const FollowedUserCard = React.forwardRef(
+	(
+		{ followUserData, userId, mutate }: Props,
+		ref: React.ForwardedRef<RefType>
+	) => {
+		const {
+			tag_name,
+			name,
+			description,
+			profile_image_url,
+			isFollowed,
+			isFollowsYou,
+		} = followUserData;
+		const { push } = useRouter();
+		const [followUserLoading, setFollowUserLoading] = useState<boolean>(false);
+		const [unfollowUserLoading, setUnfollowUserLoading] =
+			useState<boolean>(false);
+		const dispatch = useDispatch();
+		const myProfile = userId === followUserData._id;
+		const followButtonRef = useRef(null!);
 
-	const handleFollowUser = useCallback(async () => {
-		if (!myProfile) {
-			setFollowUserLoading(true);
-			await dispatch(
-				followUser({ tag_name, profile_id: userId, onComplete: () => mutate() })
-			);
-			setFollowUserLoading(false);
-		}
-	}, [dispatch, tag_name, userId, myProfile, mutate]);
-
-	const handleUnfollowUser = useCallback(async () => {
-		if (!myProfile) {
-			setUnfollowUserLoading(true);
-			await dispatch(
-				unfollowUser({
-					tag_name,
-					profile_id: userId,
-					onComplete: () => mutate(),
-				})
-			);
-			setUnfollowUserLoading(false);
-		}
-	}, [dispatch, tag_name, userId, myProfile, mutate]);
-
-	return (
-		<Container
-			role="button"
-			tabIndex={0}
-			onKeyPress={(e) => e.key === "Enter" && push(`/${tag_name}`)}
-			onClick={(e) =>
-				e.target !== followButtonRef.current && push(`/${tag_name}`)
+		const handleFollowUser = useCallback(async () => {
+			if (!myProfile) {
+				setFollowUserLoading(true);
+				await dispatch(
+					followUser({
+						tag_name,
+						profile_id: userId,
+						onComplete: () => mutate(),
+					})
+				);
+				setFollowUserLoading(false);
 			}
-		>
-			<Inner>
-				<ColLeft>
-					<AvatarProfile
-						src={profile_image_url}
-						userTagName={tag_name}
-						loading={false}
-						size={48}
-					/>
-				</ColLeft>
-				<ColRight>
-					<ColRightRow1>
-						<UserNameAndTagName>
-							<span>{name}</span>
-							<span style={{ display: "flex" }}>
-								{`@${tag_name}`}
-								{isFollowsYou && (
-									<FollowsYouBadge>
-										<span>Follows you</span>
-									</FollowsYouBadge>
-								)}
-							</span>
-						</UserNameAndTagName>
-						{!myProfile &&
-							(isFollowed ? (
-								<CustomButton
-									ref={followButtonRef}
-									className="appear"
-									disabled={unfollowUserLoading}
-									color="secondary"
-									variant="unfollow"
-									onClick={handleUnfollowUser}
-								>
-									Following
-								</CustomButton>
-							) : (
-								<CustomButton
-									ref={followButtonRef}
-									className="appear"
-									disabled={followUserLoading}
-									color="secondary"
-									onClick={handleFollowUser}
-								>
-									Follow
-								</CustomButton>
-							))}
-					</ColRightRow1>
-					{description && (
-						<ColRightRow2>
-							<span>{description}</span>
-						</ColRightRow2>
-					)}
-				</ColRight>
-			</Inner>
-		</Container>
-	);
-};
+		}, [dispatch, tag_name, userId, myProfile, mutate]);
+
+		const handleUnfollowUser = useCallback(async () => {
+			if (!myProfile) {
+				setUnfollowUserLoading(true);
+				await dispatch(
+					unfollowUser({
+						tag_name,
+						profile_id: userId,
+						onComplete: () => mutate(),
+					})
+				);
+				setUnfollowUserLoading(false);
+			}
+		}, [dispatch, tag_name, userId, myProfile, mutate]);
+
+		return (
+			<Container
+				ref={ref}
+				className="appear"
+				role="button"
+				tabIndex={0}
+				onKeyPress={(e) => e.key === "Enter" && push(`/${tag_name}`)}
+				onClick={(e) =>
+					e.target !== followButtonRef.current && push(`/${tag_name}`)
+				}
+			>
+				<Inner>
+					<ColLeft>
+						<AvatarProfile
+							src={profile_image_url}
+							userTagName={tag_name}
+							loading={false}
+							size={48}
+						/>
+					</ColLeft>
+					<ColRight>
+						<ColRightRow1>
+							<UserNameAndTagName>
+								<span>{name}</span>
+								<span style={{ display: "flex" }}>
+									{`@${tag_name}`}
+									{isFollowsYou && (
+										<FollowsYouBadge>
+											<span>Follows you</span>
+										</FollowsYouBadge>
+									)}
+								</span>
+							</UserNameAndTagName>
+							{!myProfile &&
+								(isFollowed ? (
+									<CustomButton
+										ref={followButtonRef}
+										disabled={unfollowUserLoading}
+										color="secondary"
+										variant="unfollow"
+										onClick={handleUnfollowUser}
+									>
+										Following
+									</CustomButton>
+								) : (
+									<CustomButton
+										ref={followButtonRef}
+										disabled={followUserLoading}
+										color="secondary"
+										onClick={handleFollowUser}
+									>
+										Follow
+									</CustomButton>
+								))}
+						</ColRightRow1>
+						{description && (
+							<ColRightRow2>
+								<span>{description}</span>
+							</ColRightRow2>
+						)}
+					</ColRight>
+				</Inner>
+			</Container>
+		);
+	}
+);
+FollowedUserCard.displayName = "FollowedUserCard";
 
 export default FollowedUserCard;
 
