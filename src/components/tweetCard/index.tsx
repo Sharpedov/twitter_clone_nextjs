@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import { TweetType } from "src/types";
 import styled from "styled-components";
 import AvatarProfile from "../profile/avatarProfile";
@@ -15,111 +15,121 @@ import IconButton from "../iconButton";
 interface Props {
 	tweetData: TweetType;
 }
+type RefType = HTMLDivElement;
 
-const TweetCard: React.FC<Props> = ({ tweetData }) => {
-	const {
-		text,
-		favourite_count,
-		reply_count,
-		retweet_count,
-		createdAt,
-		tweet_image_url,
-		padding_bottom,
-		user: { name, profile_image_url, tag_name },
-	} = tweetData;
+const TweetCard = React.forwardRef(
+	({ tweetData }: Props, ref: React.ForwardedRef<RefType>) => {
+		const {
+			text,
+			favourite_count,
+			reply_count,
+			retweet_count,
+			createdAt,
+			tweet_image_url,
+			padding_bottom,
+			user: { name, profile_image_url, tag_name },
+		} = tweetData;
 
-	return (
-		<Card layout tabIndex={0} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-			<TweetCardInner layout>
-				<TweetCardInnerLeftColumn layout>
-					<motion.div layout>
-						<AvatarProfile
-							src={profile_image_url}
-							loading={false}
-							userTagName={tag_name}
-							size={48}
-						/>
-					</motion.div>
-				</TweetCardInnerLeftColumn>
-				<TweetCardInnerRightColumn layout>
-					<TweetCardInnerRightColumnRow1 layout>
+		return (
+			<Card
+				ref={ref}
+				layout
+				tabIndex={0}
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+			>
+				<TweetCardInner layout>
+					<TweetCardInnerLeftColumn layout>
 						<motion.div layout>
-							<Link href={`/${tag_name}`} passHref>
-								<motion.a layout href={`/${tag_name}`}>
-									<motion.span layout>
-										<motion.span layout>{name}</motion.span>
-										<motion.span
-											layout
-											className="tweetCard__tTweetCardInnerRightColumnRowSpan"
-											style={{ marginLeft: "4px" }}
-										>
-											{`@${tag_name}`}
+							<AvatarProfile
+								src={profile_image_url}
+								loading={false}
+								userTagName={tag_name}
+								size={48}
+							/>
+						</motion.div>
+					</TweetCardInnerLeftColumn>
+					<TweetCardInnerRightColumn layout>
+						<TweetCardInnerRightColumnRow1 layout>
+							<motion.div layout>
+								<Link href={`/${tag_name}`} passHref>
+									<motion.a layout href={`/${tag_name}`}>
+										<motion.span layout>
+											<motion.span layout>{name}</motion.span>
+											<motion.span
+												layout
+												className="tweetCard__tTweetCardInnerRightColumnRowSpan"
+												style={{ marginLeft: "4px" }}
+											>
+												{`@${tag_name}`}
+											</motion.span>
 										</motion.span>
+									</motion.a>
+								</Link>
+								<motion.span
+									layout
+									className="tweetCard__tTweetCardInnerRightColumnRowSpan"
+								>
+									<motion.span layout style={{ padding: "0 4px" }}>
+										·
 									</motion.span>
-								</motion.a>
-							</Link>
-							<motion.span
-								layout
-								className="tweetCard__tTweetCardInnerRightColumnRowSpan"
-							>
-								<motion.span layout style={{ padding: "0 4px" }}>
-									·
+									{moment(createdAt).fromNow()}
 								</motion.span>
-								{moment(createdAt).fromNow()}
-							</motion.span>
-						</motion.div>
-						<motion.div layout>
-							<MoreHorizIcon />
-						</motion.div>
-					</TweetCardInnerRightColumnRow1>
-					<TweetCardInnerRightColumnRow2 layout>
-						<TweetTextContainer layout>
-							<motion.span layout>{text}</motion.span>
-						</TweetTextContainer>
-						<AnimatePresence>
-							{!!tweet_image_url && (
-								<TweetImageContainer layout>
-									<TweetImageInner layout>
-										<motion.div
-											layout
-											style={{
-												paddingBottom: `${padding_bottom}%`,
-											}}
-										/>
-										<Image
-											src={tweet_image_url}
-											alt="Image"
-											layout="fill"
-											objectFit="cover"
-										/>
-									</TweetImageInner>
-								</TweetImageContainer>
-							)}
-						</AnimatePresence>
-						<TweetToolBar layout>
-							<IconButton
-								Icon={BiMessageRounded}
-								ariaLabel="Response"
-								isInTweetCard
-							/>
-							<IconButton
-								Icon={AiOutlineRetweet}
-								ariaLabel="Retweet"
-								isInTweetCard
-							/>
-							<IconButton
-								Icon={IoHeartOutline}
-								ariaLabel="Like"
-								isInTweetCard
-							/>
-							<div />
-						</TweetToolBar>
-					</TweetCardInnerRightColumnRow2>
-				</TweetCardInnerRightColumn>
-			</TweetCardInner>
-		</Card>
-	);
-};
+							</motion.div>
+							<motion.div layout>
+								<MoreHorizIcon />
+							</motion.div>
+						</TweetCardInnerRightColumnRow1>
+						<TweetCardInnerRightColumnRow2 layout>
+							<TweetTextContainer layout>
+								<motion.span layout>{text}</motion.span>
+							</TweetTextContainer>
+							<AnimatePresence>
+								{!!tweet_image_url && (
+									<TweetImageContainer layout>
+										<TweetImageInner layout>
+											<motion.div
+												layout
+												style={{
+													paddingBottom: `${padding_bottom}%`,
+												}}
+											/>
+											<Image
+												src={tweet_image_url}
+												alt="Image"
+												layout="fill"
+												objectFit="cover"
+											/>
+										</TweetImageInner>
+									</TweetImageContainer>
+								)}
+							</AnimatePresence>
+							<TweetToolBar layout>
+								<IconButton
+									Icon={BiMessageRounded}
+									ariaLabel="Response"
+									isInTweetCard
+								/>
+								<IconButton
+									Icon={AiOutlineRetweet}
+									ariaLabel="Retweet"
+									isInTweetCard
+								/>
+								<IconButton
+									Icon={IoHeartOutline}
+									ariaLabel="Like"
+									isInTweetCard
+								/>
+								<div />
+							</TweetToolBar>
+						</TweetCardInnerRightColumnRow2>
+					</TweetCardInnerRightColumn>
+				</TweetCardInner>
+			</Card>
+		);
+	}
+);
+TweetCard.displayName = "TweetCard";
 
 export default TweetCard;
 
