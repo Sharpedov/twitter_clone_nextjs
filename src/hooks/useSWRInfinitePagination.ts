@@ -11,7 +11,8 @@ interface Props {
 export const useSWRInfinitePagination = ({ queryKey, authMethod }: Props) => {
 	const { data, error, isValidating, mutate, size, setSize } = useSWRInfinite(
 		(index) => `${queryKey}&page=${index + 1}`,
-		authMethod ? authFetcher : fetcher
+		authMethod ? authFetcher : fetcher,
+		{ revalidateAll: true }
 	);
 	const observer = useRef(null!);
 
@@ -30,7 +31,6 @@ export const useSWRInfinitePagination = ({ queryKey, authMethod }: Props) => {
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
 				if (entries[0].isIntersecting && !hasNextPage) {
-					console.log("fetch");
 					fetchNextPage();
 				}
 			});

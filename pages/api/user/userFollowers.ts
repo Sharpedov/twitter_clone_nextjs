@@ -13,16 +13,18 @@ export default authMiddleware(async function handler(req, res) {
 		case "GET":
 			{
 				try {
-					const { followers, following } = await User.findOne({
+					const { followers } = await User.findOne({
 						tag_name: new RegExp("^" + tag_name + "$", "i"),
-					}).select("followers following");
+					}).select("followers");
 
 					const followersPromise = await Promise.all(
 						followers.map(async (userId) => {
-							const user = await User.findById(userId).select("+following");
+							const user = await User.findById(userId).select(
+								"+following +followers"
+							);
 
 							const isFollowed = Boolean(
-								following.find((follow) => follow === userId)
+								user.followers.find((follow) => follow === profile_id)
 							);
 
 							const isFollowsYou = Boolean(

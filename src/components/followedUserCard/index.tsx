@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { UserType } from "src/types";
 import styled from "styled-components";
 import CustomButton from "../button";
@@ -32,7 +32,10 @@ const FollowedUserCard = React.forwardRef(
 		const [unfollowUserLoading, setUnfollowUserLoading] =
 			useState<boolean>(false);
 		const dispatch = useDispatch();
-		const myProfile = userId === followUserData._id;
+		const myProfile = useMemo(
+			() => userId === followUserData._id,
+			[followUserData, userId]
+		);
 		const followButtonRef = useRef(null!);
 
 		const handleFollowUser = useCallback(async () => {

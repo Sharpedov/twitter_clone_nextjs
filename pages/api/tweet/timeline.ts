@@ -11,12 +11,14 @@ export default authMiddleware(async function handler(req, res) {
 		case "GET":
 			{
 				try {
-					const page = parseInt(req.query.page as string);
-					const limit = parseInt(req.query.limit as string);
-
+					const page = parseInt(req.query.page);
+					const limit = parseInt(req.query.limit);
 					const startIndex = (Number(page) - 1) * Number(limit);
 
-					const tweets = await Tweet.find({}).sort({ createdAt: -1 });
+					const tweets = await Tweet.find({})
+						.sort({ createdAt: -1 })
+						.limit(limit)
+						.skip(startIndex);
 
 					const tweetsPromise = await Promise.all(
 						tweets.map(async (tweet) => {

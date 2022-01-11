@@ -8,13 +8,13 @@ import IconButton from "src/components/iconButton";
 import TopBar from "src/components/topBar";
 import Widgets from "src/components/widgets";
 import { useUser } from "src/providers/userProvider";
-import { authFetcher } from "src/utils/authAxiosMethods";
 import styled from "styled-components";
-import useSWR from "swr";
 import { HiOutlineSparkles } from "react-icons/hi";
 import SpinnerLoader from "src/components/loaders/spinnerLoader";
 import TweetCard from "src/components/tweetCard";
 import Feed from "src/components/feed";
+import { useSWRInfinitePagination } from "src/hooks/useSWRInfinitePagination";
+import { TweetType } from "src/types";
 
 const mapState = (state) => ({
 	createTweetLoading: state.tweet.create.loading,
@@ -22,7 +22,18 @@ const mapState = (state) => ({
 
 export default function Home() {
 	const { isLogged } = useUser();
-	const { data: tweets, error } = useSWR("/api/tweet/timeline", authFetcher);
+	const {
+		fetchedData,
+		isLoadingInitialData,
+		isLoadingMore,
+		isEmpty,
+		hasNextPage,
+		error,
+		lastItemRef,
+	} = useSWRInfinitePagination({
+		queryKey: `/api/tweet/timeline?limit=${15}`,
+	});
+	const data: TweetType[] = fetchedData;
 	const { createTweetLoading } = useSelector(mapState);
 	const [tweetUploadImgLoading, setTweetUploadImgLoading] =
 		useState<boolean>(false);
@@ -50,23 +61,33 @@ export default function Home() {
 				</TopBar>
 				<AnimateSharedLayout>
 					{isLogged && (
-						<AnimateSharedLayout>
-							<CreateTweetFormWrapper layout>
-								<CreateTweetForm
-									setTweetUploadImgLoading={setTweetUploadImgLoading}
-								/>
-							</CreateTweetFormWrapper>
-						</AnimateSharedLayout>
+						<CreateTweetFormWrapper layout>
+							<CreateTweetForm
+								setTweetUploadImgLoading={setTweetUploadImgLoading}
+							/>
+						</CreateTweetFormWrapper>
 					)}
-					<TweetsContainer layout>
-						{!tweets ? (
-							<motion.div layout>
-								<SpinnerLoader center loading={!tweets} />
-							</motion.div>
+					<TweetsContainer>
+						{isLoadingInitialData ? (
+							<SpinnerLoader center loading={true} />
+						) : error ? (
+							<div>{error.message}</div>
 						) : (
-							tweets.map((tweet) => (
-								<TweetCard key={tweet._id} tweetData={tweet} />
+							data.map((tweet) => (
+								<TweetCard
+									ref={lastItemRef}
+									key={tweet._id}
+									tweetData={tweet}
+								/>
 							))
+						)}
+						{isLoadingMore && !isLoadingInitialData && (
+							<SpinnerLoader center loading={true} />
+						)}
+						{isEmpty && !isLoadingInitialData ? (
+							<div>empty</div>
+						) : (
+							hasNextPage && <div style={{ height: "200px" }} />
 						)}
 					</TweetsContainer>
 				</AnimateSharedLayout>
@@ -106,7 +127,7 @@ const CreateTweetFormWrapper = styled(motion.div)`
 	}
 `;
 
-const TweetsContainer = styled(motion.section)`
+const TweetsContainer = styled.section`
 	display: flex;
 	flex-direction: column;
 	width: 100%;

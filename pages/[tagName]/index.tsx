@@ -20,7 +20,6 @@ export default function Profile(props) {
 		isEmpty,
 		hasNextPage,
 		error,
-		mutate,
 		lastItemRef,
 	} = useSWRInfinitePagination({
 		queryKey: `/api/tweet/userTweets?userId=${userData._id}&limit=${15}`,
@@ -36,10 +35,10 @@ export default function Profile(props) {
 						: `${userData.name} (@${userData.tag_name}) / Twitter`}
 				</title>
 			</Head>
-			{error ? (
-				<div>{error.message}</div>
-			) : isLoadingInitialData ? (
+			{isLoadingInitialData ? (
 				<SpinnerLoader loading={true} center />
+			) : error ? (
+				<div>{error.message}</div>
 			) : (
 				<TweetsContainer>
 					{data.map((tweet) => (
@@ -48,7 +47,7 @@ export default function Profile(props) {
 					{isLoadingMore && !isLoadingInitialData && (
 						<SpinnerLoader loading={true} center />
 					)}
-					{isEmpty && !userData.myProfile ? (
+					{isEmpty && !isLoadingInitialData && !userData.myProfile ? (
 						<EmptyContainer>
 							<span>{`@${userData.tag_name} does not send any tweet yet`}</span>
 							<span>This user&apos;s tweets will appear here.</span>

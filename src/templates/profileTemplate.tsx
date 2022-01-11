@@ -35,7 +35,7 @@ const ProfileTemplate: React.FC<Props> = ({ children }) => {
 	const { query, back, pathname } = useRouter();
 	const { data: profileData, error: profileError } = useSWR<UserType>(
 		query.tagName &&
-			`/api/user/userByTagName?tag_name=${query.tagName}&profile_id=${user._id}`,
+			`/api/user/userByTagName?tag_name=${query.tagName}&profile_id=${user?._id}`,
 		fetcher
 	);
 	const [followUserLoading, setFollowUserLoading] = useState<boolean>(false);
@@ -170,7 +170,7 @@ const ProfileTemplate: React.FC<Props> = ({ children }) => {
 										alt={userData.tag_name}
 										aria-label={userData.tag_name}
 									>
-										{!userData.profile_image_url && userData.tag_name[0]}
+										{!userData?.profile_image_url && userData.tag_name[0]}
 									</ProfileImageInnerPic>
 								)}
 							</ProfileImageInner>

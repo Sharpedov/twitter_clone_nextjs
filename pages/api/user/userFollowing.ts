@@ -15,11 +15,17 @@ export default authMiddleware(async function handler(req, res) {
 				try {
 					const { following } = await User.findOne({
 						tag_name: new RegExp("^" + tag_name + "$", "i"),
-					}).select("followers following");
+					}).select("following");
 
 					const followingPromise = await Promise.all(
 						following.map(async (userId) => {
-							const user = await User.findById(userId).select("+following");
+							const user = await User.findById(userId).select(
+								"+following +followers"
+							);
+
+							const isFollowed = Boolean(
+								user.followers.find((follow) => follow === profile_id)
+							);
 
 							const isFollowsYou = Boolean(
 								user.following.find((follow) => follow === profile_id)
@@ -27,7 +33,7 @@ export default authMiddleware(async function handler(req, res) {
 
 							return {
 								...user._doc,
-								isFollowed: true,
+								isFollowed,
 								isFollowsYou,
 							};
 						})

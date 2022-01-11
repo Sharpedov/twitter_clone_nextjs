@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import TopBar from "src/components/topBar";
@@ -10,8 +10,6 @@ import ScrollSnapList from "src/components/scrollSnapList";
 import { useUser } from "src/providers/userProvider";
 import useSWR from "swr";
 import { fetcher } from "src/utils/fetcher";
-import { useDispatch } from "react-redux";
-import { followUser, unfollowUser } from "src/store/slices/userSlice";
 
 interface Props {}
 
@@ -21,15 +19,14 @@ interface UserData extends UserType {
 }
 
 const ProfileFollowsTemplate: React.FC<Props> = ({ children }) => {
-	const { user, loading } = useUser();
-	const { query, back, pathname } = useRouter();
+	const { user, loading, isLogged } = useUser();
+	const { query, back, pathname, replace } = useRouter();
 	const { data: profileData, error: profileError } = useSWR<UserType>(
 		query.tagName &&
+			isLogged &&
 			`/api/user/userByTagName?tag_name=${query.tagName}&profile_id=${user._id}`,
 		fetcher
 	);
-
-	const dispatch = useDispatch();
 
 	const userData: UserData = useMemo(() => {
 		switch (query.tagName) {
@@ -66,6 +63,12 @@ const ProfileFollowsTemplate: React.FC<Props> = ({ children }) => {
 		}
 		return child;
 	});
+
+	useEffect(() => {
+		!isLogged && replace("/");
+		return;
+	}, [isLogged, replace]);
+	if (!isLogged) return null;
 
 	return (
 		<>

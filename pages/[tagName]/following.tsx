@@ -25,9 +25,10 @@ export default function ProfileFollowing(props) {
 		mutate,
 		lastItemRef,
 	} = useSWRInfinitePagination({
-		queryKey: `/api/user/userFollowing?tag_name=${
-			userData.tag_name
-		}&profile_id=${user._id}&limit=${15}`,
+		queryKey:
+			user._id &&
+			userData.tag_name &&
+			`/api/user/userFollowing?tag_name=${userData.tag_name}&profile_id=${user._id}`,
 	});
 	const data: UserType[] = fetchedData;
 
@@ -37,15 +38,15 @@ export default function ProfileFollowing(props) {
 				<title>Following</title>
 			</Head>
 			<FollowersContainer>
-				{error ? (
-					<div>{error.message}</div>
-				) : isLoadingInitialData ? (
+				{isLoadingInitialData ? (
 					<SpinnerLoader loading={true} center />
+				) : error ? (
+					<div>{error.message}</div>
 				) : (
 					data.map((follow) => (
 						<FollowedUserCard
 							ref={lastItemRef}
-							key={`followers-${follow._id}`}
+							key={`following-${follow._id}`}
 							followUserData={follow}
 							userId={user._id}
 							mutate={mutate}
@@ -55,7 +56,7 @@ export default function ProfileFollowing(props) {
 				{isLoadingMore && !isLoadingInitialData && (
 					<SpinnerLoader loading={true} center />
 				)}
-				{isEmpty && !userData.myProfile ? (
+				{isEmpty && !isLoadingInitialData && !userData.myProfile ? (
 					<EmptyContainer>
 						<span>{`@${userData.tag_name} isn't following anyone`}</span>
 						<span>When they do, they&apos;ll be listed here.</span>
