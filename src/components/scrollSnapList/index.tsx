@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import Link from "next/link";
 import { ButtonBase } from "@mui/material";
 import { useRef } from "react";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import IconButton from "../iconButton";
+import Link from "next/link";
 
 type ItemType = {
 	text: string;
@@ -64,37 +64,64 @@ const ScrollSnapList: React.FC<Props> = ({ list }) => {
 		}
 	}, []);
 
+	const handleForward = useCallback(() => {
+		if (listRef.current) {
+			const { width } = listRef.current.getBoundingClientRect();
+
+			listRef.current.scrollLeft += 460 - width;
+		}
+	}, []);
+	const handleBackwards = useCallback(() => {
+		if (listRef.current) {
+			const { width } = listRef.current.getBoundingClientRect();
+
+			listRef.current.scrollLeft += width - 460;
+		}
+	}, []);
+
 	return (
 		<List>
 			<ArrowWrapper side="left" active={firstItemIsOffTheScreen}>
-				<IconButton Icon={ArrowBackRoundedIcon} ariaLabel="Prev" />
+				<IconButton
+					Icon={ArrowBackRoundedIcon}
+					ariaLabel="Backwards"
+					onClick={handleBackwards}
+					disableFocus
+				/>
 			</ArrowWrapper>
 			<ListInner ref={listRef}>
 				{list.map((item, i) => (
-					<Item
-						key={item.text}
-						ref={
-							i === 0
-								? firstItemRef
-								: i === list.length - 1
-								? lastItemRef
-								: null
-						}
-					>
-						<Link href={item.href} passHref scroll={false} replace>
-							<Item component="div" active={item.active}>
-								<a href={item.href} tabIndex={-1}>
+					<Link key={item.text} href={item.href} passHref>
+						<StyledLink>
+							<Item
+								tabIndex={-1}
+								component="div"
+								active={item.active}
+								ref={
+									i === 0
+										? firstItemRef
+										: i === list.length - 1
+										? lastItemRef
+										: null
+								}
+							>
+								<div>
 									<span>
 										{item.text} <span />
 									</span>
-								</a>
+								</div>
 							</Item>
-						</Link>
-					</Item>
+						</StyledLink>
+					</Link>
 				))}
 			</ListInner>
 			<ArrowWrapper side="right" active={secondItemIsOffTheScreen}>
-				<IconButton Icon={ArrowForwardRoundedIcon} ariaLabel="Prev" />
+				<IconButton
+					Icon={ArrowForwardRoundedIcon}
+					ariaLabel="Forward"
+					onClick={handleForward}
+					disableFocus
+				/>
 			</ArrowWrapper>
 		</List>
 	);
@@ -107,6 +134,7 @@ const List = styled.nav`
 	display: flex;
 	width: 100%;
 	border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
+	user-select: none;
 `;
 
 const ListInner = styled.div`
@@ -126,6 +154,11 @@ const ListInner = styled.div`
 	}
 `;
 
+const StyledLink = styled.a`
+	width: 100%;
+	outline: none;
+`;
+
 const Item = styled(ButtonBase)`
 	display: flex;
 	flex-grow: 1;
@@ -140,9 +173,8 @@ const Item = styled(ButtonBase)`
 	border-radius: 0px;
 	color: ${({ theme, active }) =>
 		active ? theme.colors.text.primary : theme.colors.text.secondary};
-	transition: background-color 0.15s ease;
 
-	& > a {
+	& > div {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -173,7 +205,7 @@ const Item = styled(ButtonBase)`
 		background-color: ${({ theme }) => theme.colors.hover.primary};
 	}
 
-	&:focus-visible {
+	${StyledLink}:focus-visible & {
 		background-color: ${({ theme }) => theme.colors.hover.primary};
 	}
 `;
