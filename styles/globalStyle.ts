@@ -29,7 +29,7 @@ const GlobalStyle = createGlobalStyle`
         background: ${({ theme }) => theme.colors.background.primary};
         color: ${({ theme }) => theme.colors.text.primary};
         ::selection {
-        background-color: green;
+            background-color: green;
         }
         transition: background 0.2s ease;
         color: background 0.2s ease;

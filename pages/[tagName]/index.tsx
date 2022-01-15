@@ -15,10 +15,9 @@ export default function Profile(props) {
 	const userData: User = props.userData;
 	const {
 		fetchedData,
-		isLoadingInitialData,
 		isLoadingMore,
 		isEmpty,
-		hasNextPage,
+		isReachedEnd,
 		error,
 		lastItemRef,
 	} = useSWRInfinitePagination({
@@ -35,28 +34,46 @@ export default function Profile(props) {
 						: `${userData.name} (@${userData.tag_name}) / Twitter`}
 				</title>
 			</Head>
-			{isLoadingInitialData ? (
-				<SpinnerLoader loading={true} center />
-			) : error ? (
-				<div>{error.message}</div>
-			) : (
-				<TweetsContainer>
-					{data.map((tweet) => (
-						<TweetCard ref={lastItemRef} key={tweet._id} tweetData={tweet} />
-					))}
-					{isLoadingMore && !isLoadingInitialData && (
-						<SpinnerLoader loading={true} center />
-					)}
-					{isEmpty && !isLoadingInitialData && !userData.myProfile ? (
-						<EmptyContainer>
-							<span>{`@${userData.tag_name} does not send any tweet yet`}</span>
-							<span>This user&apos;s tweets will appear here.</span>
-						</EmptyContainer>
-					) : (
-						hasNextPage && <div style={{ height: "200px" }} />
-					)}
-				</TweetsContainer>
-			)}
+			<TweetsContainer>
+				{userData.loading ? (
+					<SpinnerLoader loading={true} center paddingBottom={60} />
+				) : (
+					<>
+						{error ? (
+							<ErrorMessage>
+								<span>Something went wrong.</span>
+							</ErrorMessage>
+						) : (
+							<>
+								{data.map((tweet, i) => {
+									if (data.length === i + 1) {
+										return (
+											<TweetCard
+												ref={lastItemRef}
+												key={tweet._id}
+												tweetData={tweet}
+											/>
+										);
+									} else {
+										return <TweetCard key={tweet._id} tweetData={tweet} />;
+									}
+								})}
+							</>
+						)}
+						{isEmpty && !userData.myProfile && (
+							<EmptyContainer>
+								<span>{`@${userData.tag_name} does not send any tweet yet`}</span>
+								<span>This user&apos;s tweets will appear here.</span>
+							</EmptyContainer>
+						)}
+						{isLoadingMore ? (
+							<SpinnerLoader loading={true} center paddingBottom={60} />
+						) : (
+							isReachedEnd && <div style={{ height: "200px" }} />
+						)}
+					</>
+				)}
+			</TweetsContainer>
 		</>
 	);
 }
@@ -66,6 +83,19 @@ const TweetsContainer = styled.div`
 	flex-direction: column;
 	flex-grow: 1;
 	width: 100%;
+`;
+
+const ErrorMessage = styled.div`
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 0 auto;
+	padding: 32px 16px;
+	text-align: center;
+	width: 100%;
+	font-size: 17px;
+	line-height: 20px;
+	color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 const EmptyContainer = styled.div`

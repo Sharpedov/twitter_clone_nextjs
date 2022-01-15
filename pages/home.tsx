@@ -27,7 +27,7 @@ export default function Home() {
 		isLoadingInitialData,
 		isLoadingMore,
 		isEmpty,
-		hasNextPage,
+		isReachedEnd,
 		error,
 		lastItemRef,
 	} = useSWRInfinitePagination({
@@ -87,7 +87,7 @@ export default function Home() {
 						{isEmpty && !isLoadingInitialData ? (
 							<div>empty</div>
 						) : (
-							hasNextPage && <div style={{ height: "200px" }} />
+							isReachedEnd && <div style={{ height: "200px" }} />
 						)}
 					</TweetsContainer>
 				</AnimateSharedLayout>

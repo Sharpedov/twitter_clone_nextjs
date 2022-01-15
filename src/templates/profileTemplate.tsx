@@ -22,6 +22,8 @@ import { fetcher } from "src/utils/fetcher";
 import { useDispatch } from "react-redux";
 import { followUser, unfollowUser } from "src/store/slices/userSlice";
 import Link from "next/link";
+import { openNotLoggedModal } from "src/store/slices/modalSlice";
+import { is } from "immer/dist/internal";
 
 interface Props {}
 
@@ -31,7 +33,7 @@ interface UserData extends UserType {
 }
 
 const ProfileTemplate: React.FC<Props> = ({ children }) => {
-	const { user, loading } = useUser();
+	const { user, loading, isLogged } = useUser();
 	const { query, back, pathname } = useRouter();
 	const { data: profileData, error: profileError } = useSWR<UserType>(
 		query.tagName &&
@@ -83,14 +85,13 @@ const ProfileTemplate: React.FC<Props> = ({ children }) => {
 		},
 	];
 
-	const childrenWithProps = React.Children.map(children, (child) => {
-		if (React.isValidElement(child)) {
-			return React.cloneElement(child, { userData });
-		}
-		return child;
-	});
+	const handleOpenNotLoggedModal = useCallback(
+		() => dispatch(openNotLoggedModal()),
+		[dispatch]
+	);
 
 	const handleFollowUser = useCallback(async () => {
+		if (!isLogged) return handleOpenNotLoggedModal();
 		if (!userData.myProfile) {
 			setFollowUserLoading(true);
 			await dispatch(
@@ -98,9 +99,10 @@ const ProfileTemplate: React.FC<Props> = ({ children }) => {
 			);
 			setFollowUserLoading(false);
 		}
-	}, [dispatch, userData, user]);
+	}, [dispatch, userData, user, handleOpenNotLoggedModal, isLogged]);
 
 	const handleUnfollowUser = useCallback(async () => {
+		if (!isLogged) return handleOpenNotLoggedModal();
 		if (!userData.myProfile) {
 			setUnfollowUserLoading(true);
 			await dispatch(
@@ -108,7 +110,16 @@ const ProfileTemplate: React.FC<Props> = ({ children }) => {
 			);
 			setUnfollowUserLoading(false);
 		}
-	}, [dispatch, userData, user]);
+	}, [dispatch, userData, user, isLogged, handleOpenNotLoggedModal]);
+
+	const childrenWithProps = React.Children.map(children, (child) => {
+		if (React.isValidElement(child)) {
+			return React.cloneElement(child, { userData });
+		}
+		return child;
+	});
+
+	if (profileError) return null;
 
 	return (
 		<>
@@ -170,7 +181,7 @@ const ProfileTemplate: React.FC<Props> = ({ children }) => {
 										alt={userData.tag_name}
 										aria-label={userData.tag_name}
 									>
-										{!userData?.profile_image_url && userData.tag_name[0]}
+										{userData?.tag_name[0]}
 									</ProfileImageInnerPic>
 								)}
 							</ProfileImageInner>
@@ -295,7 +306,7 @@ const ProfileTemplate: React.FC<Props> = ({ children }) => {
 									<SkeletonLoader height={19} width={90} />
 								</div>
 							</>
-						) : (
+						) : isLogged ? (
 							<>
 								<Link href={`/${userData.tag_name}/following`} passHref>
 									<a>
@@ -313,6 +324,22 @@ const ProfileTemplate: React.FC<Props> = ({ children }) => {
 										</div>
 									</a>
 								</Link>
+							</>
+						) : (
+							<>
+								<a>
+									<div className="appear" onClick={handleOpenNotLoggedModal}>
+										<span>{userData.following_count}</span>{" "}
+										<span>Following</span>
+									</div>
+								</a>
+
+								<a>
+									<div className="appear" onClick={handleOpenNotLoggedModal}>
+										<span>{userData.followers_count}</span>{" "}
+										<span>Followers</span>
+									</div>
+								</a>
 							</>
 						)}
 					</ProfileRow5>

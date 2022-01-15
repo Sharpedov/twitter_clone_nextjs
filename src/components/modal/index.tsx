@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import styled from "styled-components";
 import FocusTrap from "focus-trap-react";
+import { DisableScrollbar } from "src/utils/disableScrollbar";
 
 interface Props {
 	isOpen: boolean;
@@ -39,10 +40,12 @@ const Modal: React.FC<Props> = ({
 }) => {
 	const [mounted, setMounted] = useState(false);
 	const backdropRef = useRef<HTMLElement>(null!);
+	DisableScrollbar(isOpen);
 
 	const handleClose = useCallback(
-		(e: Event) => e.target === backdropRef.current && onClose(),
-		[onClose]
+		(e: Event) =>
+			shouldCloseOutside && e.target === backdropRef.current && onClose(),
+		[onClose, shouldCloseOutside]
 	);
 
 	const handleEscape = useCallback(
@@ -55,10 +58,8 @@ const Modal: React.FC<Props> = ({
 	}, []);
 
 	useEffect(() => {
-		if (backdropRef.current) {
-			document.addEventListener("keydown", handleEscape);
-			return () => document.removeEventListener("keydown", handleEscape);
-		}
+		document.addEventListener("keydown", handleEscape);
+		return () => document.removeEventListener("keydown", handleEscape);
 	}, [handleEscape]);
 
 	return (
@@ -74,7 +75,7 @@ const Modal: React.FC<Props> = ({
 						initial="hidden"
 						animate="visible"
 						exit="hidden"
-						onClick={shouldCloseOutside && handleClose}
+						onClick={handleClose}
 					>
 						<Content layout toTop={toTop} variants={contentVariants}>
 							<ContentInner layout>{children}</ContentInner>
@@ -134,7 +135,8 @@ const Content = styled(motion.div)`
 		max-width: 80vw;
 		min-height: ${({ toTop }) => (toTop ? "auto" : "400px")};
 		max-height: 90vh;
-		height: ${({ toTop }) => (toTop ? "auto" : "650px")};
+		/* height: ${({ toTop }) => (toTop ? "auto" : "650px")}; */
+		height: auto;
 		border-radius: 16px;
 		width: auto;
 	}

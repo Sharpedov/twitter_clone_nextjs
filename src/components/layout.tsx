@@ -4,6 +4,7 @@ import ProfileFollowsTemplate from "src/templates/profileFollowsTemplate";
 import ProfileTemplate from "src/templates/profileTemplate";
 import styled from "styled-components";
 import Header from "./header";
+import NotLoggedModal from "./modal/notLoggedModal";
 
 interface Props {}
 
@@ -27,6 +28,7 @@ const Layout: React.FC<Props> = ({ children }) => {
 							children
 						)}
 					</Main>
+					<NotLoggedModal />
 				</Container>
 			) : (
 				children
@@ -56,25 +58,6 @@ const Container = styled.div`
 	@media screen and (min-width: 1290px) {
 		max-width: 1260px;
 	}
-
-	/* display: grid;
-	width: 100%;
-	justify-content: center;
-	grid-template-columns: 1fr;
-	min-height: 100vh;
-
-	@media ${({ theme }) => theme.breakpoints.md} {
-		grid-template-columns: auto 600px;
-	}
-	@media ${({ theme }) => theme.breakpoints.lg} {
-		grid-template-columns: auto 920px;
-	}
-	@media screen and (min-width: 1110px) {
-		grid-template-columns: auto 990px;
-	}
-	@media screen and (min-width: 1290px) {
-		grid-template-columns: auto 990px;
-	} */
 `;
 
 const Main = styled.main`

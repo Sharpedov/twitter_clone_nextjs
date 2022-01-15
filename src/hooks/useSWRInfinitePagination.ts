@@ -22,21 +22,21 @@ export const useSWRInfinitePagination = ({ queryKey, authMethod }: Props) => {
 		isLoadingInitialData ||
 		(size > 0 && data && typeof data[size - 1] === "undefined");
 	const isEmpty = data?.[0]?.length === 0;
-	const hasNextPage = isEmpty || (data && data[data.length - 1]?.length < 3);
+	const isReachedEnd = isEmpty || (data && data[data.length - 1]?.length < 3);
 	const isRefreshing = isValidating && data && data.length === size;
 	const lastItemRef = useCallback(
 		(node) => {
 			const fetchNextPage = () => setSize((size) => size + 1);
-			if (isLoadingMore || hasNextPage) return;
+			if (isLoadingMore || isReachedEnd) return;
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
-				if (entries[0].isIntersecting && !hasNextPage) {
+				if (entries[0].isIntersecting && !isReachedEnd) {
 					fetchNextPage();
 				}
 			});
 			if (node) observer.current.observe(node);
 		},
-		[isLoadingMore, hasNextPage, setSize]
+		[isLoadingMore, isReachedEnd, setSize]
 	);
 
 	return {
@@ -47,7 +47,7 @@ export const useSWRInfinitePagination = ({ queryKey, authMethod }: Props) => {
 		isLoadingInitialData,
 		isLoadingMore,
 		isEmpty,
-		hasNextPage,
+		isReachedEnd,
 		isRefreshing,
 		mutate,
 		lastItemRef,

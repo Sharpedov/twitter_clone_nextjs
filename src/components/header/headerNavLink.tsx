@@ -91,35 +91,4 @@ const NavLink = styled(ButtonBase)`
 			margin: 0 16px 0 20px;
 		}
 	}
-
-	/* display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-grow: 1;
-	border-radius: 50px;
-	cursor: pointer;
-	transition: background 0.2s;
-
-
-	> span {
-		display: none;
-	}
-
-	&:hover {
-		background: ${({ theme }) => theme.colors.hover.primary};
-	} */
-
-	/* @media ${({ theme }) => theme.breakpoints.md} {
-		padding: 12px;
-	}
-	@media screen and (min-width: 1290px) {
-		justify-content: flex-start;
-		align-self: flex-start;
-
-		> span {
-			display: inline-block;
-			font-size: inherit;
-			margin: 0 16px 0 20px;
-		}
-	} */
 `;
