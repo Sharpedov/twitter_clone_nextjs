@@ -15,6 +15,7 @@ import TweetCard from "src/components/tweetCard";
 import Feed from "src/components/feed";
 import { useSWRInfinitePagination } from "src/hooks/useSWRInfinitePagination";
 import { TweetType } from "src/types";
+import TopBarMobile from "src/components/topBarMobile";
 
 const mapState = (state) => ({
 	createTweetLoading: state.tweet.create.loading,
@@ -51,6 +52,7 @@ export default function Home() {
 			</Head>
 			<Feed>
 				<TopBar
+					disableOnMobileView
 					withoutIcon
 					loading={tweetUploadImgLoading || createTweetLoading}
 				>
@@ -59,6 +61,12 @@ export default function Home() {
 						<IconButton Icon={HiOutlineSparkles} ariaLabel="Sort tweets" />
 					</TopBarInner>
 				</TopBar>
+				<TopBarMobile>
+					<TopBarInner>
+						<h2>Latest Tweets</h2>
+						<IconButton Icon={HiOutlineSparkles} ariaLabel="Sort tweets" />
+					</TopBarInner>
+				</TopBarMobile>
 				<AnimateSharedLayout>
 					{isLogged && (
 						<CreateTweetFormWrapper layout>
@@ -131,4 +139,9 @@ const TweetsContainer = styled.section`
 	display: flex;
 	flex-direction: column;
 	width: 100%;
+	border-top: 1px solid ${({ theme }) => theme.colors.border.primary};
+
+	@media ${({ theme }) => theme.breakpoints.md} {
+		border-top: 0px;
+	}
 `;

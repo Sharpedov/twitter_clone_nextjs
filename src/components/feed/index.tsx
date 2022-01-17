@@ -19,6 +19,7 @@ const Container = styled.div`
 	flex-direction: column;
 	border-right: 1px solid ${({ theme }) => theme.colors.border.primary};
 	border-left: 1px solid ${({ theme }) => theme.colors.border.primary};
+
 	min-height: 100vh;
 	max-width: 600px;
 	width: 100%;

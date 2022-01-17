@@ -19,6 +19,7 @@ const AvatarProfile: React.FC<Props> = ({
 	loading,
 	userTagName,
 	link = true,
+	onClick,
 }) => {
 	return loading ? (
 		<SkeletonLoader height={size ?? 40} width={size ?? 40} variant="circular" />
@@ -30,6 +31,7 @@ const AvatarProfile: React.FC<Props> = ({
 					alt={userTagName}
 					aria-label={userTagName}
 					size={size}
+					onClick={onClick && onClick}
 				>
 					{!src && userTagName[0]}
 				</StyledAvatar>
@@ -41,6 +43,7 @@ const AvatarProfile: React.FC<Props> = ({
 			alt={userTagName}
 			aria-label={userTagName}
 			size={size}
+			onClick={onClick && onClick}
 		>
 			{!src && userTagName[0]}
 		</StyledAvatar>
@@ -84,4 +87,5 @@ const StyledAvatar = styled(Avatar)`
 	width: ${({ size }) => (size ? `${size}px` : "40px")};
 	height: ${({ size }) => (size ? `${size}px` : "40px")};
 	font-size: 20px;
+	cursor: pointer;
 `;

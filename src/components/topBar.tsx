@@ -13,6 +13,7 @@ interface Props {
 	withoutIcon?: boolean;
 	iconAriaLabel?: string;
 	animatedLayout?: boolean;
+	disableOnMobileView?: boolean;
 }
 
 const TopBar: React.FC<Props> = ({
@@ -24,9 +25,13 @@ const TopBar: React.FC<Props> = ({
 	withoutIcon,
 	iconAriaLabel,
 	animatedLayout = false,
+	disableOnMobileView,
 }) => {
 	return (
-		<StyledTopBar layout={animatedLayout}>
+		<StyledTopBar
+			layout={animatedLayout}
+			disableOnMobileView={disableOnMobileView}
+		>
 			<LinearLoader loading={loading} />
 			{!withoutIcon && (
 				<motion.div layout={animatedLayout} style={{ marginLeft: "-8px" }}>
@@ -49,7 +54,8 @@ export default TopBar;
 const StyledTopBar = styled(motion.div)`
 	position: sticky;
 	top: -0px;
-	display: flex;
+	display: ${({ disableOnMobileView }) =>
+		disableOnMobileView ? "none" : "flex"};
 	align-items: center;
 	height: 53px;
 	background-color: rgba(0, 0, 0, 0.72);
@@ -59,6 +65,10 @@ const StyledTopBar = styled(motion.div)`
 	margin: 0 auto;
 	padding: 0 16px;
 	z-index: 3;
+
+	@media ${({ theme }) => theme.breakpoints.md} {
+		display: flex;
+	}
 `;
 
 const SpanText = styled(motion.span)`

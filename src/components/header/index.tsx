@@ -28,7 +28,6 @@ import SkeletonLoader from "../loaders/skeletonLoader";
 import { useRouter } from "next/router";
 import { Button, CardActionArea } from "@mui/material";
 import Modal from "../modal";
-import TopBar from "../topBar";
 import CreateTweetForm from "../form/createTweetForm";
 import { AnimateSharedLayout } from "framer-motion";
 
